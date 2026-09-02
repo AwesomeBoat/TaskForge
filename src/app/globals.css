@@ -1,0 +1,280 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ---------------------------------------------------------------------------
+   Design tokens. Semantic names only — components never reference raw hex.
+   --------------------------------------------------------------------------- */
+:root {
+  --bg: #f7f7fa;
+  --bg-subtle: #eeeef4;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --border: #e4e4ec;
+  --border-strong: #d3d3df;
+  --text: #14141b;
+  --text-muted: #6b6b7d;
+  --text-faint: #9a9aac;
+
+  --accent: #6d5cf5;
+  --accent-hover: #5c4ae8;
+  --accent-soft: #eeecff;
+  --accent-contrast: #ffffff;
+
+  --ember: #f0870b;
+  --ember-soft: #fdf0dd;
+
+  --success: #12a150;
+  --success-soft: #e3f7ec;
+  --danger: #dc3d43;
+  --danger-soft: #fdeaea;
+
+  --priority-low: #4d8ef7;
+  --priority-low-soft: #e7f0fe;
+  --priority-medium: #d98207;
+  --priority-medium-soft: #fdf1de;
+  --priority-high: #e0484d;
+  --priority-high-soft: #fdeced;
+
+  --shadow-sm: 0 1px 2px rgb(16 16 26 / 0.06);
+  --shadow-md: 0 4px 14px -4px rgb(16 16 26 / 0.1), 0 2px 4px -2px rgb(16 16 26 / 0.06);
+  --shadow-lg: 0 20px 50px -12px rgb(16 16 26 / 0.22);
+  --shadow-glow: 0 0 0 1px rgb(109 92 245 / 0.16), 0 8px 30px -8px rgb(109 92 245 / 0.35);
+}
+
+[data-theme='dark'] {
+  --bg: #0a0a0d;
+  --bg-subtle: #111116;
+  --surface: #141419;
+  --surface-raised: #1a1a21;
+  --border: #26262f;
+  --border-strong: #34343f;
+  --text: #f0f0f5;
+  --text-muted: #9797a8;
+  --text-faint: #6a6a7a;
+
+  --accent: #8b7cff;
+  --accent-hover: #9d90ff;
+  --accent-soft: #1e1a3d;
+  --accent-contrast: #0a0a0d;
+
+  --ember: #ffa53d;
+  --ember-soft: #2c1e0c;
+
+  --success: #3ecf80;
+  --success-soft: #0f2a1c;
+  --danger: #ff6b6f;
+  --danger-soft: #2c1315;
+
+  --priority-low: #7ab0ff;
+  --priority-low-soft: #14243c;
+  --priority-medium: #ffb454;
+  --priority-medium-soft: #2e2110;
+  --priority-high: #ff7a7e;
+  --priority-high-soft: #331619;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 14px -4px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 24px 60px -12px rgb(0 0 0 / 0.7);
+  --shadow-glow: 0 0 0 1px rgb(139 124 255 / 0.24), 0 8px 30px -8px rgb(139 124 255 / 0.4);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-contrast: var(--accent-contrast);
+
+  --color-ember: var(--ember);
+  --color-ember-soft: var(--ember-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --color-priority-low: var(--priority-low);
+  --color-priority-low-soft: var(--priority-low-soft);
+  --color-priority-medium: var(--priority-medium);
+  --color-priority-medium-soft: var(--priority-medium-soft);
+  --color-priority-high: var(--priority-high);
+  --color-priority-high-soft: var(--priority-high-soft);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --shadow-card: var(--shadow-sm);
+  --shadow-float: var(--shadow-md);
+  --shadow-modal: var(--shadow-lg);
+  --shadow-accent: var(--shadow-glow);
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  --animate-rise: rise 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-pop: pop 0.28s cubic-bezier(0.2, 1.2, 0.4, 1);
+  --animate-float-up: float-up 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  --animate-shimmer: shimmer 1.4s ease-in-out infinite;
+  --animate-fade: fade 0.18s ease-out;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.85);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  [data-theme='dark'] {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* One consistent, high-contrast focus ring everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+
+  input,
+  textarea,
+  button,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-faint);
+    background-clip: content-box;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hides content visually but keeps it for screen readers. */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* Honour the OS setting: keep meaning, drop motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

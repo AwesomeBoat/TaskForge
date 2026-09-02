@@ -64,6 +64,39 @@ export function formatDueDate(due: IsoDate, today: IsoDate): string {
   });
 }
 
+/** The hour of day (0-23) it currently is for someone in `timezone`. */
+export function hourIn(timezone: string, at: Date = new Date()): number {
+  const hour = new Intl.DateTimeFormat('en-GB', {
+    timeZone: timezone,
+    hour: '2-digit',
+    hour12: false,
+  }).format(at);
+  const parsed = Number(hour);
+  return Number.isFinite(parsed) ? parsed % 24 : 12;
+}
+
+/**
+ * Rendered on the server from the user's stored timezone rather than from the
+ * browser clock, so the greeting is right on first paint and never rehydrates
+ * into a different one.
+ */
+export function greetingFor(timezone: string, at: Date = new Date()): string {
+  const hour = hourIn(timezone, at);
+  if (hour < 5) return 'Good night';
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+export function longDateIn(timezone: string, at: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(at);
+}
+
 export function browserTimezone(): string {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';

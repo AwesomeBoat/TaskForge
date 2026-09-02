@@ -1,17 +1,111 @@
 'use client';
 
 import { useState } from 'react';
+import { Monitor, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { useToast } from '@/components/ui/Toast';
+import { cn } from '@/lib/cn';
+import { applyTheme } from '@/lib/theme';
 import { useTaskStore } from '@/features/tasks/task-store';
 import type { ThemePreference } from '@/types';
 
+const THEMES: Array<{ value: ThemePreference; label: string; icon: React.ComponentType<{ className?: string }> }> = [
+  { value: 'system', label: 'System', icon: Monitor },
+  { value: 'light', label: 'Light', icon: Sun },
+  { value: 'dark', label: 'Dark', icon: Moon },
+];
+
 export default function SettingsPage() {
   const { user, updatePreferences } = useTaskStore();
+  const toast = useToast();
   const [name, setName] = useState(user.displayName);
-  const [theme, setTheme] = useState<ThemePreference>(user.theme);
-  const [sound, setSound] = useState(user.soundEnabled);
   const [saving, setSaving] = useState(false);
-  async function save() { setSaving(true); await updatePreferences({ displayName: name, theme, soundEnabled: sound }); const dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches); document.documentElement.dataset.theme = dark ? 'dark' : 'light'; localStorage.setItem('taskforge-theme', theme); setSaving(false); }
-  return <div className="mx-auto w-full max-w-2xl space-y-6 px-4 pb-24 pt-8 sm:px-6 sm:pb-10"><header><p className="text-sm font-semibold tracking-[0.14em] text-accent">SETTINGS</p><h1 className="mt-2 text-2xl font-semibold tracking-tight text-text">Make it yours.</h1></header><Card className="space-y-5"><div><label htmlFor="display-name" className="mb-1.5 block text-sm font-medium text-muted">Display name</label><input id="display-name" value={name} onChange={(event) => setName(event.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm" /></div><div><p className="mb-1.5 text-sm font-medium text-muted">Theme</p><div className="flex gap-2">{(['system', 'light', 'dark'] as ThemePreference[]).map((item) => <button type="button" key={item} onClick={() => setTheme(item)} className={`rounded-lg border px-3 py-2 text-sm capitalize ${theme === item ? 'border-accent bg-accent-soft text-accent' : 'border-border text-muted'}`}>{item}</button>)}</div></div><label className="flex items-center justify-between border-t border-border pt-5 text-sm text-text">Completion sound<input type="checkbox" checked={sound} onChange={(event) => setSound(event.target.checked)} className="size-4 accent-[var(--accent)]" /></label><div className="flex justify-end"><Button onClick={() => void save()} loading={saving}>Save changes</Button></div><p className="text-xs text-faint">Signed in as {user.email}</p></Card></div>;
+
+  /** Theme is applied and stored the moment it is picked — no Save round trip. */
+  const chooseTheme = (theme: ThemePreference) => {
+    applyTheme(theme);
+    void updatePreferences({ theme });
+  };
+
+  const saveProfile = async () => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      toast.error('Your name cannot be empty.');
+      return;
+    }
+    setSaving(true);
+    await updatePreferences({ displayName: trimmed });
+    setSaving(false);
+    toast.success('Saved.');
+  };
+
+  return (
+    <div className="mx-auto w-full max-w-2xl space-y-6 px-4 pb-24 pt-6 sm:px-6 sm:pb-10 sm:pt-8">
+      <header>
+        <p className="text-sm font-semibold tracking-[0.14em] text-accent">SETTINGS</p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-text">Make it yours.</h1>
+      </header>
+
+      <Card className="space-y-5">
+        <h2 className="text-[15px] font-semibold text-text">Profile</h2>
+
+        <Input
+          label="Display name"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          maxLength={60}
+          hint={`Signed in as ${user.email}`}
+        />
+
+        <div className="flex justify-end">
+          <Button variant="primary" onClick={() => void saveProfile()} loading={saving}>
+            Save changes
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="space-y-5">
+        <h2 className="text-[15px] font-semibold text-text">Appearance</h2>
+
+        <div className="space-y-2">
+          <span className="block text-[13px] font-medium text-muted">Theme</span>
+          <div role="radiogroup" aria-label="Theme" className="flex flex-wrap gap-2">
+            {THEMES.map(({ value, label, icon: Icon }) => (
+              <button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={user.theme === value}
+                onClick={() => chooseTheme(value)}
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors',
+                  user.theme === value
+                    ? 'border-accent bg-accent-soft text-accent'
+                    : 'border-border text-muted hover:border-border-strong hover:text-text',
+                )}
+              >
+                <Icon className="size-4" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <label className="flex cursor-pointer items-center justify-between gap-4 border-t border-border pt-5">
+          <span>
+            <span className="block text-sm text-text">Completion sound</span>
+            <span className="block text-[12px] text-muted">A short chime when you finish a task.</span>
+          </span>
+          <input
+            type="checkbox"
+            checked={user.soundEnabled}
+            onChange={(event) => void updatePreferences({ soundEnabled: event.target.checked })}
+            className="size-4 accent-[var(--accent)]"
+          />
+        </label>
+      </Card>
+    </div>
+  );
 }

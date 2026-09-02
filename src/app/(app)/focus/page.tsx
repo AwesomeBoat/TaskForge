@@ -1,5 +1,10 @@
-import { FocusPage } from '../FocusPage';
+import { Suspense } from 'react';
+import { FocusMode } from '@/features/focus/FocusMode';
 
 export default function FocusRoute() {
-  return <FocusPage />;
+  return (
+    <Suspense fallback={null}>
+      <FocusMode />
+    </Suspense>
+  );
 }

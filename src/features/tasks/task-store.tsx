@@ -18,7 +18,14 @@ export type NewTaskInput = {
 
 export type TaskPatch = Partial<NewTaskInput>;
 
-type Reward = { id: number; xp: number; level: number; streak: number; streakIncreased: boolean };
+type Reward = {
+  id: number;
+  xp: number;
+  level: number;
+  streak: number;
+  streakIncreased: boolean;
+  leveledUp: boolean;
+};
 
 type TaskStoreValue = {
   tasks: Task[];
@@ -220,6 +227,7 @@ export function TaskStoreProvider({
             level: result.level,
             streak: result.streak.current,
             streakIncreased: result.streak.increased,
+            leveledUp: result.level > stats.level,
           });
           if (user.soundEnabled) playCompletionChime();
         }
@@ -231,7 +239,7 @@ export function TaskStoreProvider({
         markPending(id, false);
       }
     },
-    [markPending, scheduleStatsRefresh, stats.today, stats.xp, tasks, toast, user.soundEnabled],
+    [markPending, scheduleStatsRefresh, stats.level, stats.today, stats.xp, tasks, toast, user.soundEnabled],
   );
 
   const clearCompleted = useCallback(async () => {

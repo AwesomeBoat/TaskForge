@@ -110,7 +110,10 @@ export async function listTasks(userId: string, query: TaskQuery, timezone: stri
   const direction = query.direction === 'asc' ? asc : desc;
   const orderBy = {
     created: direction(tasks.createdAt),
-    due: direction(tasks.dueDate),
+    due:
+      query.direction === 'asc'
+        ? sql`${tasks.dueDate} asc nulls last`
+        : sql`${tasks.dueDate} desc nulls last`,
     priority: query.direction === 'asc' ? asc(PRIORITY_RANK) : desc(PRIORITY_RANK),
     title: direction(tasks.title),
   }[query.sort];

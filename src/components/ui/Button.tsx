@@ -21,6 +21,19 @@ const SIZES: Record<Size, string> = {
   icon: 'h-9 w-9 rounded-lg',
 };
 
+const BASE =
+  'inline-flex items-center justify-center font-medium transition-[background-color,border-color,color,transform] ' +
+  'duration-150 active:scale-[0.985] disabled:pointer-events-none disabled:opacity-55';
+
+/** Shared so anchors and links can wear the same styling without a Slot component. */
+export function buttonClasses({
+  variant = 'secondary',
+  size = 'md',
+  className,
+}: { variant?: Variant; size?: Size; className?: string } = {}): string {
+  return cn(BASE, VARIANTS[variant], SIZES[size], className);
+}
+
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant;
   size?: Size;
@@ -35,13 +48,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       ref={ref}
       disabled={disabled || loading}
-      className={cn(
-        'inline-flex items-center justify-center font-medium transition-[background-color,border-color,color,transform] duration-150',
-        'active:scale-[0.985] disabled:pointer-events-none disabled:opacity-55',
-        VARIANTS[variant],
-        SIZES[size],
-        className,
-      )}
+      className={buttonClasses({ variant, size, className })}
       {...props}
     >
       {loading && <Loader2 aria-hidden className="size-4 animate-spin" />}
